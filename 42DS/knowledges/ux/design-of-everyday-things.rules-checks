@@ -1,0 +1,76 @@
+# The Design of Everyday Things — Reglas para IA
+
+## meta
+- domain: interaction-design
+- source: "The Design of Everyday Things — Don Norman"
+- goal: evaluar affordances, signifiers, mapeo y feedback
+
+## concepts_enabled
+- Affordance
+- Signifier
+- Mapping
+- Feedback
+
+## affordance_signifier
+check:
+  - name: interactive_looks_interactive
+    target: ["button","link","icon_button","input"]
+    rule:
+      - is_interactive == true AND visual_signifiers_strength < threshold -> issue
+    output_template:
+      concept: "AffordanceSignifier"
+      problem: "Elemento interactivo no parece interactivo"
+      recommendation_patterns:
+        - "Añade estilos de botón (color, borde, relieve, hover)"
+  - name: non_interactive_looks_interactive
+    target: ["text", "decorative_element"]
+    rule:
+      - is_interactive == false AND looks_like_button_or_link == true -> issue
+
+## mapping
+check:
+  - name: directional_controls
+    target: ["navigation_control","carousel_control","stepper"]
+    rule:
+      - action_direction != icon_direction -> issue
+    output_template:
+      concept: "Mapping"
+      problem: "Dirección del control no coincide con el resultado"
+  - name: spatial_mapping
+    target: ["grouped_controls"]
+    rule:
+      - control_position_unrelated_to_affected_element -> issue
+
+## feedback
+check:
+  - name: action_feedback
+    target: ["action"]
+    rule:
+      - time_to_visible_feedback > 0.5s -> issue
+    output_template:
+      concept: "Feedback"
+      problem: "Acción sin feedback inmediato"
+      recommendation_patterns:
+        - "Añade indicador de carga o cambio de estado"
+  - name: error_feedback_clarity
+    target: ["error_state"]
+    rule:
+      - feedback_unclear OR only_generic_error -> issue
+
+## states_visibility
+check:
+  - name: distinguishable_states
+    target: ["button","input","toggle"]
+    rule:
+      - visual_difference(normal,hover,active,disabled) < threshold -> issue
+    output_template:
+      concept: "States"
+      problem: "Estados poco distinguibles"
+      recommendation_patterns:
+        - "Aumenta diferencias de color, borde o iconografía entre estados"
+
+## checklist_element
+- es_obvia_la_interacción_permitida?
+- el aspecto coincide_con_la_acción?
+- los estados son visiblemente_diferentes?
+- hay feedback inmediato y claro?

@@ -1,0 +1,92 @@
+# Strategic Writing for UX — Reglas para IA
+
+## meta
+- domain: ux-writing
+- source: "Strategic Writing for UX — Torrey Podmajersky"
+- goal: evaluar y mejorar microcopy y textos UX
+
+## dimensions_enabled
+- Purpose
+- Concise
+- Conversational
+- ActionOriented
+
+## purpose
+check:
+  - name: text_has_clear_task
+    target: ["heading", "body_text", "helper_text"]
+    rule:
+      - no_detectable_user_task AND no_business_goal -> issue
+    output_template:
+      dimension: "Purpose"
+      problem: "Texto sin propósito claro"
+      recommendation_patterns:
+        - "Reescribe el texto para alinearlo con la tarea del usuario"
+        - "Elimina texto decorativo que no ayude a avanzar"
+
+## concise
+check:
+  - name: overlong_sentences
+    target: ["sentence"]
+    rule:
+      - word_count > 25 -> issue
+    output_template:
+      dimension: "Concise"
+      problem: "Frase demasiado larga"
+      recommendation_patterns:
+        - "Divide la frase en dos oraciones más cortas"
+        - "Elimina palabras de relleno"
+  - name: redundant_phrases
+    target: ["text_block"]
+    rule:
+      - repeated_information_detected -> issue
+
+## conversational
+check:
+  - name: jargon
+    target: ["text_block"]
+    rule:
+      - technical_terms_density_high AND audience != expert -> issue
+    output_template:
+      dimension: "Conversational"
+      problem: "Lenguaje demasiado técnico"
+      recommendation_patterns:
+        - "Sustituye jerga por palabras de uso común"
+  - name: person_address
+    target: ["text_block"]
+    rule:
+      - no_second_person_pronouns AND context == b2c -> warning
+
+## action_oriented
+check:
+  - name: button_labels
+    target: ["button"]
+    rule:
+      - label in ["OK","Aceptar","Hecho","Sí","No","Aquí","Click aquí"] AND no_additional_context -> issue
+    output_template:
+      dimension: "ActionOriented"
+      problem: "Texto de botón genérico"
+      recommendation_patterns:
+        - "Usa verbo + objeto (ej: 'Guardar cambios', 'Crear cuenta')"
+  - name: error_messages
+    target: ["error_message"]
+    rule:
+      - no_explanation OR no_next_step -> issue
+    output_template:
+      dimension: "ActionOriented"
+      problem: "Mensaje de error poco útil"
+      recommendation_patterns:
+        - "Explica qué ha pasado y qué puede hacer el usuario ahora"
+
+## content_types_checklist
+- buttons:
+    - starts_with_verb?
+    - describe_result?
+- errors:
+    - explica_causa?
+    - ofrece_solución?
+- headings:
+    - responde_a: "¿qué puedo hacer aquí?"
+- empty_states:
+    - explica_beneficio?
+    - indica_próximo_paso?
